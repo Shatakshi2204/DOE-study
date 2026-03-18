@@ -93,7 +93,7 @@ function Hero() {
       animation: 'fadeUp 0.7s ease forwards',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-        
+        <Tag color={C.accent}>Project 2</Tag>
         <Tag color={C.text2}>Apple PQE Portfolio</Tag>
         <Tag color={C.green}>2³ Factorial Design</Tag>
       </div>
@@ -283,22 +283,19 @@ function Predictor() {
   const [temp, setTemp] = useState(240)
   const [pres, setPres] = useState(1.0)
   const [time, setTime] = useState(5)
-  const [result, setResult] = useState(null)
-  const [loading, setLoading] = useState(false)
-
-  const predict = useCallback(async () => {
-    setLoading(true)
-    try {
-      const r = await predictStrength(temp, pres, time)
-      setResult(r)
-    } catch {
-      setResult({ predicted_strength: null, error: true })
-    } finally {
-      setLoading(false)
+  // Calculate directly in React — instant, no backend needed
+  const calcStrength = (t, p, tm) => {
+    const tc = Math.max(-1.5, Math.min(1.5, (t  - 220) / (260 - 220) * 2 - 1))
+    const pc = Math.max(-1.5, Math.min(1.5, (p  - 0.5) / (1.5 - 0.5) * 2 - 1))
+    const mc = Math.max(-1.5, Math.min(1.5, (tm - 3)   / (7   - 3)   * 2 - 1))
+    const s  = 45.0 + 8.0*tc + 4.5*pc + 3.0*mc + 1.5*tc*pc + 2.5*tc*mc
+    return {
+      predicted_strength: Math.round(s * 100) / 100,
+      passes_spec:        s >= 50,
+      safety_margin:      Math.round((s - 50) * 100) / 100,
     }
-  }, [temp, pres, time])
-
-  useEffect(() => { predict() }, [predict])
+  }
+  const result = calcStrength(temp, pres, time)
 
   const SliderInput = ({ label, value, min, max, step, unit, onChange, color }) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -358,9 +355,7 @@ function Predictor() {
           background: C.bg3, borderRadius: 12, padding: '32px 24px',
           border: `1px solid ${passes ? C.green : C.red}30`,
         }}>
-          {loading ? (
-            <div style={{ color: C.text2, fontSize: 13, animation: 'pulse 1s infinite' }}>Computing…</div>
-          ) : strength !== null && strength !== undefined ? (
+          {
             <>
               <div style={{ fontSize: 11, color: C.text2, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Predicted Strength</div>
               <div style={{
@@ -384,9 +379,7 @@ function Predictor() {
                 Spec limit: 50.0 MPa &nbsp;(IPC-7095)
               </div>
             </>
-          ) : (
-            <div style={{ color: C.red, fontSize: 13 }}>Backend offline — run locally</div>
-          )}
+          }
         </div>
       </div>
     </Card>
