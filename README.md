@@ -1,5 +1,6 @@
 DOE Study — PCB Soldering Process Optimization
 Apple PQE Internship Portfolio | 2³ Full Factorial Design of Experiments
+
 🔗 Live Demo: doe-study.vercel.app
 
 <img width="1914" height="859" alt="image" src="https://github.com/user-attachments/assets/5bdba74f-36e8-44ea-8a61-9fdbdcb32987" />
